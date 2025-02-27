@@ -1,3 +1,9 @@
+/**
+ * @file Utils.cpp
+ * @author Andres Ochoa Hernandez
+ * @brief Implementation file for Utils.hpp
+ */
+
 #include "Utils.hpp"
 
 #include <random>
