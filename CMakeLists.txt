@@ -17,7 +17,7 @@ if(DOXYGEN_FOUND)
         doc_doxygen ALL
         COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        COMMENT "Generating TestMvb documentation with Doxygen"
+        COMMENT "Generating documentation with Doxygen"
     )
 
 else(DOXYGEN_FOUND)
