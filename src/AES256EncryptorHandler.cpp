@@ -8,8 +8,12 @@
 
 #include "Utils.hpp"
 
+std::string AES256EncryptorHandler::generateKey()
+{
+    return generateRandomString(32);
+}
 
-std::string AES256EncryptorHandler::encrypt(const std::string& message,const std::string& key)
+std::string AES256EncryptorHandler::encrypt(const std::string& plaintext,const std::string& key)
 {
     std::string key256Bit = padString(key,32,'0');
     std::string iv128Bit = generateRandomString(AES_BLOCK_SIZE);
@@ -33,16 +37,16 @@ std::string AES256EncryptorHandler::encrypt(const std::string& message,const std
         throw CryptoHandlerException("Failed to create initialize symmetric encryption object");
     }
 
-    std::vector<unsigned char> ciphertext(message.size() + AES_BLOCK_SIZE);
+    std::vector<unsigned char> cyphertext(plaintext.size() + AES_BLOCK_SIZE);
     int cipertextLength;
 
     int encryptUpdateResult = 
         EVP_EncryptUpdate(
             ctx, 
-            ciphertext.data(), 
+            cyphertext.data(), 
             &cipertextLength, 
-            reinterpret_cast<unsigned char*>(const_cast<char*>(message.c_str())), 
-            static_cast<int>(message.length())
+            reinterpret_cast<unsigned char*>(const_cast<char*>(plaintext.c_str())), 
+            static_cast<int>(plaintext.length())
         );
 
     if (encryptUpdateResult != 1) {
@@ -50,19 +54,19 @@ std::string AES256EncryptorHandler::encrypt(const std::string& message,const std
         throw CryptoHandlerException("Failed to update the encryption");
     }
 
-    ciphertext.resize(cipertextLength);
+    cyphertext.resize(cipertextLength);
 
     EVP_CIPHER_CTX_free(ctx);
     
-    return iv128Bit + std::string(ciphertext.begin(), ciphertext.end());
+    return iv128Bit + std::string(cyphertext.begin(), cyphertext.end());
 }
 
-std::string AES256EncryptorHandler::decrypt(const std::string& message,const std::string& key)
+std::string AES256EncryptorHandler::decrypt(const std::string& cyphertext,const std::string& key)
 {
     std::string key256Bit = padString(key,32,'0');
     std::string iv128Bit(AES_BLOCK_SIZE,'0');
 
-    std::copy(message.begin(), message.begin() + AES_BLOCK_SIZE, iv128Bit.begin());
+    std::copy(cyphertext.begin(), cyphertext.begin() + AES_BLOCK_SIZE, iv128Bit.begin());
 
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
     if(ctx == nullptr){
@@ -83,7 +87,7 @@ std::string AES256EncryptorHandler::decrypt(const std::string& message,const std
         throw CryptoHandlerException("Failed to create initialize symmetric decryption object");
     }
 
-    std::vector<unsigned char> plaintext(message.size() - AES_BLOCK_SIZE);
+    std::vector<unsigned char> plaintext(cyphertext.size() - AES_BLOCK_SIZE);
     int plaintextLength;
 
     int decryptUpdateResult = 
@@ -91,8 +95,8 @@ std::string AES256EncryptorHandler::decrypt(const std::string& message,const std
             ctx, 
             plaintext.data(), 
             &plaintextLength, 
-            reinterpret_cast<unsigned char*>(const_cast<char*>(message.data() + AES_BLOCK_SIZE)), 
-            static_cast<int>(message.size() - AES_BLOCK_SIZE));
+            reinterpret_cast<unsigned char*>(const_cast<char*>(cyphertext.data() + AES_BLOCK_SIZE)), 
+            static_cast<int>(cyphertext.size() - AES_BLOCK_SIZE));
 
     if (decryptUpdateResult != 1) {
         EVP_CIPHER_CTX_free(ctx);

@@ -6,10 +6,10 @@
 int main(int argc, char* argv[])
 {
     AES256EncryptorHandler testSymmetricEncryption;
-    RSAEncryptorHandler testAsymmetricEncryption;
 
-    std::string message = "Hello!";
-    std::string key = "12345";
+    std::string message = "Hello! This communication is encrypted!";
+    std::string key = testSymmetricEncryption.generateKey();
+    std::cout << "Generated key : " << key << std::endl;
 
     std::string encryptedPayload = testSymmetricEncryption.encrypt(message,key);
     std::string decryptedPayload = testSymmetricEncryption.decrypt(encryptedPayload,key);
