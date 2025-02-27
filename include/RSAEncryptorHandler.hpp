@@ -1,5 +1,15 @@
+/**
+ * @file RSAEncryptorHandler.hpp
+ * @author Andres Ochoa Hernandez
+ * @brief This file contains the class RSAEncryptorHandler
+ */
+
 #include "CryptoHandler.hpp"
 
+/**
+ * @struct RsaKeyPair
+ * @brief Contains the public and private key
+ */
 struct RsaKeyPair
 {
     std::string publicKey;

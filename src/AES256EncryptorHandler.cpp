@@ -1,3 +1,9 @@
+/**
+ * @file AES256EncryptorHandler.cpp
+ * @author Andres Ochoa Hernandez
+ * @brief Implementation file for AES256EncryptorHandler.hpp
+ */
+
 #include <openssl/evp.h>
 #include <openssl/aes.h>
 
