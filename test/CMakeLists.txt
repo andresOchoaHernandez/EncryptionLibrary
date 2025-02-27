@@ -1,0 +1,3 @@
+include_directories (${PROJECT_SOURCE_DIR}/include)
+add_executable (Test_AES256EncryptorHandler Test_AES256EncryptorHandler.cpp)
+target_link_libraries (Test_AES256EncryptorHandler ec)

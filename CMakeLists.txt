@@ -26,7 +26,7 @@ else(DOXYGEN_FOUND)
 
 endif()
 
-add_executable(ec ${PROJECT_SOURCE_DIR}/Main.cpp)
+add_library(ec)
 
 target_include_directories(
     ec
@@ -52,3 +52,9 @@ target_sources(
 )
 
 target_link_libraries(ec OpenSSL::SSL)
+
+add_subdirectory(${PROJECT_SOURCE_DIR}/test)
+
+enable_testing()
+
+add_test(NAME Test_AES256EncryptorHandler COMMAND Test_AES256EncryptorHandler)
