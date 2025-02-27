@@ -8,9 +8,9 @@ struct RsaKeyPair
 
 class RSAEncryptorHandler : public CryptoHandler
 {
+    public : 
+        RsaKeyPair generateKeyPair(int bits);
 
-    RsaKeyPair generateKeyPair(int bits);
-
-    std::string encrypt(const std::string& message,const std::string& key) override;
-    std::string decrypt(const std::string& message,const std::string& key) override;
+        std::string encrypt(const std::string& message,const std::string& key) override;
+        std::string decrypt(const std::string& message,const std::string& key) override;
 };

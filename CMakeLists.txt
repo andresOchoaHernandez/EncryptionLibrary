@@ -44,8 +44,11 @@ target_sources(
 
     PRIVATE ${PROJECT_SOURCE_DIR}/include/CryptoHandler.hpp
 
+    PRIVATE ${PROJECT_SOURCE_DIR}/include/Utils.hpp
+
     PRIVATE ${PROJECT_SOURCE_DIR}/src/AES256EncryptorHandler.cpp
     PRIVATE ${PROJECT_SOURCE_DIR}/src/RSAEncryptorHandler.cpp
+    PRIVATE ${PROJECT_SOURCE_DIR}/src/Utils.cpp
 )
 
 target_link_libraries(ec OpenSSL::SSL)

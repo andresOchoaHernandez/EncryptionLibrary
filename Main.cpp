@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
     AES256EncryptorHandler testSymmetricEncryption;
     RSAEncryptorHandler testAsymmetricEncryption;
 
-    std::cout << "Hello world" << std::endl;
+    std::cout << testSymmetricEncryption.encrypt("Hello!","12345") << std::endl;
 
     return 0;
 }
