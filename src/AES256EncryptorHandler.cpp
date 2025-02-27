@@ -12,7 +12,7 @@
 std::string AES256EncryptorHandler::encrypt(const std::string& message,const std::string& key)
 {
     std::string key256Bit = padString(key,32,'0');
-    std::string iv128Bit = generateRandomString(16);
+    std::string iv128Bit = generateRandomString(AES_BLOCK_SIZE);
 
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
     if(ctx == nullptr){
@@ -54,30 +54,54 @@ std::string AES256EncryptorHandler::encrypt(const std::string& message,const std
 
     EVP_CIPHER_CTX_free(ctx);
     
-    return iv128Bit + std::string(ciphertext.begin(), ciphertext.end());;
+    return iv128Bit + std::string(ciphertext.begin(), ciphertext.end());
 }
 
 std::string AES256EncryptorHandler::decrypt(const std::string& message,const std::string& key)
 {
-    // EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-    // if (!ctx) {
-    //     std::cerr << "Failed to create EVP_CIPHER_CTX" << std::endl;
-    //     return false;
-    // }
+    std::string key256Bit = padString(key,32,'0');
+    std::string iv128Bit(AES_BLOCK_SIZE,'0');
 
-    // if (EVP_DecryptInit_ex(ctx, EVP_aes_256_gcm(), nullptr, key, iv) != 1) {
-    //     std::cerr << "Failed to initialize decryption" << std::endl;
-    //     EVP_CIPHER_CTX_free(ctx);
-    //     return false;
-    // }
+    std::copy(message.begin(), message.begin() + AES_BLOCK_SIZE, iv128Bit.begin());
 
-    // if (EVP_DecryptUpdate(ctx, plaintext, &plaintext_len, ciphertext, ciphertext_len) != 1) {
-    //     std::cerr << "Failed to decrypt data" << std::endl;
-    //     EVP_CIPHER_CTX_free(ctx);
-    //     return false;
-    // }
+    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+    if(ctx == nullptr){
+        throw CryptoHandlerException("Failed to create EVP_CIPHER_CTX object");
+    }
 
-    // EVP_CIPHER_CTX_free(ctx);
-    // return true;
-    return "";
+    int decryptInitResult = 
+        EVP_DecryptInit_ex(
+            ctx, 
+            EVP_aes_256_gcm(), 
+            nullptr, 
+            reinterpret_cast<unsigned char*>(const_cast<char*>(key256Bit.c_str())), 
+            reinterpret_cast<unsigned char*>(const_cast<char*>(iv128Bit.c_str()))
+        );
+
+    if (decryptInitResult != 1) {
+        EVP_CIPHER_CTX_free(ctx);
+        throw CryptoHandlerException("Failed to create initialize symmetric decryption object");
+    }
+
+    std::vector<unsigned char> plaintext(message.size() - AES_BLOCK_SIZE);
+    int plaintextLength;
+
+    int decryptUpdateResult = 
+        EVP_DecryptUpdate(
+            ctx, 
+            plaintext.data(), 
+            &plaintextLength, 
+            reinterpret_cast<unsigned char*>(const_cast<char*>(message.data() + AES_BLOCK_SIZE)), 
+            static_cast<int>(message.size() - AES_BLOCK_SIZE));
+
+    if (decryptUpdateResult != 1) {
+        EVP_CIPHER_CTX_free(ctx);
+        throw CryptoHandlerException("Failed to update the decryption object");
+    }
+
+    plaintext.resize(plaintextLength);
+
+    EVP_CIPHER_CTX_free(ctx);
+
+    return std::string(plaintext.begin(), plaintext.end());
 }
