@@ -3,6 +3,53 @@
 #include "AES256EncryptorHandler.hpp"
 #include "Utils.hpp"
 
+bool test_nullKey()
+{
+    AES256EncryptorHandler test;
+
+    // An exception should be generated
+    test.encrypt("Hello",nullptr);
+
+    return false;
+}
+
+bool test_nullMessage()
+{
+    AES256EncryptorHandler test;
+
+    // An exception should be generated
+    test.encrypt(nullptr,"secret key");
+
+    return false;
+}
+
+bool test_emptyString()
+{
+    AES256EncryptorHandler test;
+
+    const std::string key = test.generateKey();
+
+    const std::string message = "";
+
+    const std::string cyphertext = test.encrypt(message,key);
+
+    return message == test.decrypt(cyphertext,key);
+}
+
+bool test_edgeCases()
+{
+    if(!test_emptyString())
+        return false;
+
+    if(!test_nullMessage())
+        return false;
+
+    if(!test_nullKey())
+        return false;
+
+    return true;
+}
+
 bool test_stressTest_randomKeyRandomLengthMessage()
 {
     /* Maximum 1 MB messages */
@@ -96,6 +143,9 @@ int main (int argc, char* argv[])
         return -1;
 
     if(!test_stressTest_randomKeyRandomLengthMessage())
+        return -1;
+
+    if(!test_edgeCases())
         return -1;
         
     return 0;
