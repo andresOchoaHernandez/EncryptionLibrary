@@ -7,7 +7,6 @@
 #include <openssl/evp.h>
 #include <openssl/aes.h>
 
-#include <iostream>
 #include <vector>
 
 #include "AES256EncryptorHandler.hpp"
