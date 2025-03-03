@@ -1,26 +1,38 @@
 #include <random>
+#include <stdexcept>
 
 #include "AES256EncryptorHandler.hpp"
 #include "Utils.hpp"
 
-bool test_nullKey()
+bool test_noInitVector()
 {
     AES256EncryptorHandler test;
 
-    // An exception should be generated
-    test.encrypt("Hello",nullptr);
+    std::string cypherText = test.encrypt("Hello","12345");
 
-    return false;
+    bool result;
+
+    try
+    {
+        test.decrypt("c","1234");
+        result = false;
+    }
+    catch(const std::length_error& e)
+    {
+        result = true;
+    }
+
+    return result;
 }
 
-bool test_nullMessage()
+bool test_differentKey()
 {
     AES256EncryptorHandler test;
 
-    // An exception should be generated
-    test.encrypt(nullptr,"secret key");
+    std::string cypherText = test.encrypt("Hello","12345");
+    std::string plainText = test.decrypt(cypherText,"1234");
 
-    return false;
+    return plainText != "Hello";
 }
 
 bool test_emptyString()
@@ -41,10 +53,10 @@ bool test_edgeCases()
     if(!test_emptyString())
         return false;
 
-    if(!test_nullMessage())
+    if(!test_differentKey())
         return false;
 
-    if(!test_nullKey())
+    if(!test_noInitVector())
         return false;
 
     return true;

@@ -1,7 +1,5 @@
 #include <random>
 
-#include <iostream>
-
 #include "Utils.hpp"
 
 bool test_randomStringLength()
