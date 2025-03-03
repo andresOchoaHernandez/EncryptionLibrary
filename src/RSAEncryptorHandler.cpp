@@ -4,7 +4,19 @@
  * @brief Implementation file for RSAEncryptorHandler.hpp
  */
 
+#include <openssl/evp.h>
+
 #include "RSAEncryptorHandler.hpp"
+
+EVP_PKEY* keypairToEVP_PKEY(RsaKeyPair keyPair)
+{
+    return nullptr;
+}
+
+RsaKeyPair EVP_PKEYToKeypair(EVP_PKEY* keyPair)
+{
+    return {"pub","priv"};
+}
 
 RsaKeyPair RSAEncryptorHandler::generateKeyPair(int bits)
 {
