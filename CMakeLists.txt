@@ -58,3 +58,4 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/test)
 enable_testing()
 
 add_test(NAME Test_AES256EncryptorHandler COMMAND Test_AES256EncryptorHandler)
+add_test(NAME Test_Utils COMMAND Test_Utils)
