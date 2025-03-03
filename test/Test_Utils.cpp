@@ -4,6 +4,21 @@
 
 #include "Utils.hpp"
 
+bool test_randomStringLength()
+{
+    const int maxStrLen = 10000;
+
+    std::random_device random_device;
+    std::mt19937 generator(random_device());
+    std::uniform_int_distribution<> distribution(0,maxStrLen);
+
+    const int strLen = distribution(generator);
+    
+    std::string randomString = generateRandomString(strLen);
+
+    return randomString.size() == strLen;
+}
+
 bool test_padStringRandom()
 {
     const int maxStrLen = 10000;
@@ -12,8 +27,8 @@ bool test_padStringRandom()
     std::mt19937 generator(random_device());
     std::uniform_int_distribution<> distribution(0,maxStrLen);
 
-    int strLen = distribution(generator);
-    int nOfBytes = distribution(generator);
+    const int strLen = distribution(generator);
+    const int nOfBytes = distribution(generator);
 
     std::string testString = "";
 
@@ -53,6 +68,9 @@ int main (int argc, char* argv[])
         return -1;
 
     if(!test_padStringRandom())
+        return -1;
+
+    if(!test_randomStringLength())
         return -1;
         
     return 0;
