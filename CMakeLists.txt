@@ -1,6 +1,6 @@
-project(EncryptedCommunication)
-
 cmake_minimum_required(VERSION 3.16)
+
+project(EncryptedCommunication)
 
 find_package(OpenSSL REQUIRED)
 
@@ -58,4 +58,7 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/test)
 enable_testing()
 
 add_test(NAME Test_AES256EncryptorHandler COMMAND Test_AES256EncryptorHandler)
+
+add_test(NAME Test_RSAEncryptorHandler COMMAND Test_RSAEncryptorHandler)
+
 add_test(NAME Test_Utils COMMAND Test_Utils)

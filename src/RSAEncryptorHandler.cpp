@@ -6,6 +6,7 @@
 
 #include <openssl/evp.h>
 #include <openssl/rsa.h>
+#include <openssl/pem.h>
 
 #include "RSAEncryptorHandler.hpp"
 
@@ -16,7 +17,25 @@ EVP_PKEY* keypairToEVP_PKEY(RsaKeyPair keyPair)
 
 RsaKeyPair EVP_PKEYToKeypair(EVP_PKEY* keyPair)
 {
-    return {"pub","priv"};
+    char *bp;
+    size_t size;
+    FILE *stream;
+
+    /* Writing public key to a string */
+    stream = open_memstream (&bp, &size);
+    PEM_write_PUBKEY(stream, keyPair);
+    fflush (stream);
+    std::string publicKeyString = bp;
+    fclose (stream);
+
+    /* Writing private key to a string */
+    stream = open_memstream (&bp, &size);
+    PEM_write_PrivateKey(stream, keyPair, nullptr, nullptr, 0, nullptr, nullptr);
+    fflush (stream);
+    std::string privateKeyString = bp;
+    fclose (stream);
+
+    return {publicKeyString,privateKeyString};
 }
 
 RsaKeyPair RSAEncryptorHandler::generateKeyPair(int bits)
@@ -49,6 +68,7 @@ RsaKeyPair RSAEncryptorHandler::generateKeyPair(int bits)
 
     RsaKeyPair result = EVP_PKEYToKeypair(key);
 
+    EVP_PKEY_free(key);
     EVP_PKEY_CTX_free(ctx);
 
     return result;
