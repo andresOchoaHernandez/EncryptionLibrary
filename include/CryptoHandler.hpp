@@ -41,7 +41,8 @@ class CryptoHandlerException : public std::exception
         /**
          * @brief constructor for the class CryptoHandlerException
          */
-        CryptoHandlerException(const char* msg):message(msg){}
+        CryptoHandlerException(const char* msg):message(msg)
+        {}
 
         /**
          * @brief override of the what function

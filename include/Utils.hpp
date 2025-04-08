@@ -23,3 +23,23 @@ std::string padString(const std::string& str, size_t numberOfBytes,char paddingC
  * @returns A string of length bytes
  */
 std::string generateRandomString(size_t length);
+
+/**
+ * @brief Writes a file
+ * @param path Path of the file to be written
+ * @param content Content of the file
+ */
+void writeFile(const std::string& path,const std::string& content);
+
+/**
+ * @brief Reads a file
+ * @param path Path of the file to be read
+ * @returns A string with the file content
+ */
+std::string readFile(const std::string& path);
+
+/**
+ * @brief Deletes a file
+ * @param path Path of the file to be deleted
+ */
+void deleteFile(const std::string& path);

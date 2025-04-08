@@ -1,5 +1,6 @@
 #include <random>
 #include <stdexcept>
+#include <iostream>
 
 #include "AES256EncryptorHandler.hpp"
 #include "Utils.hpp"
@@ -143,8 +144,31 @@ bool test_helloWorld()
     return message == test.decrypt(cyphertext,key);
 }
 
+bool test_saveKeyToFileAndSaveCyphertextThenReadAndDecrypt()
+{
+    AES256EncryptorHandler test;
+
+    const std::string key = test.generateKey();
+
+    const std::string message = "This is a secret message! I hope no one is able to decrypt it";
+
+    writeFile("sKey.txt",key);
+    writeFile("cyphertext.txt",test.encrypt(message,key));
+
+    const std::string rKey = readFile("sKey.txt"); 
+    const std::string cyphertext = readFile("cyphertext.txt");
+
+    deleteFile("sKey.txt");
+    deleteFile("cyphertext.txt");
+
+    return message == test.decrypt(cyphertext,rKey);
+}
+
 int main (int argc, char* argv[])
 {
+    if(!test_saveKeyToFileAndSaveCyphertextThenReadAndDecrypt())
+        return -1;
+
     if(!test_helloWorld())
         return -1;
 

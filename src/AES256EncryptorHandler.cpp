@@ -24,7 +24,8 @@ std::string AES256EncryptorHandler::encrypt(const std::string& plaintext,const s
     std::string iv128Bit = generateRandomString(AES_BLOCK_SIZE);
 
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-    if(ctx == nullptr){
+    if(ctx == nullptr)
+    {
         throw CryptoHandlerException("Failed to create EVP_CIPHER_CTX object");
     }
 
@@ -37,7 +38,8 @@ std::string AES256EncryptorHandler::encrypt(const std::string& plaintext,const s
             reinterpret_cast<unsigned char*>(const_cast<char*>(iv128Bit.c_str()))
         );
 
-    if (encryptInitResult != 1) {
+    if (encryptInitResult != 1) 
+    {
         EVP_CIPHER_CTX_free(ctx);
         throw CryptoHandlerException("Failed to create initialize symmetric encryption object");
     }
@@ -54,7 +56,8 @@ std::string AES256EncryptorHandler::encrypt(const std::string& plaintext,const s
             static_cast<int>(plaintext.length())
         );
 
-    if (encryptUpdateResult != 1) {
+    if (encryptUpdateResult != 1) 
+    {
         EVP_CIPHER_CTX_free(ctx);
         throw CryptoHandlerException("Failed to update the encryption");
     }
@@ -74,7 +77,8 @@ std::string AES256EncryptorHandler::decrypt(const std::string& cyphertext,const 
     std::copy(cyphertext.begin(), cyphertext.begin() + AES_BLOCK_SIZE, iv128Bit.begin());
 
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-    if(ctx == nullptr){
+    if(ctx == nullptr)
+    {
         throw CryptoHandlerException("Failed to create EVP_CIPHER_CTX object");
     }
 
@@ -87,7 +91,8 @@ std::string AES256EncryptorHandler::decrypt(const std::string& cyphertext,const 
             reinterpret_cast<unsigned char*>(const_cast<char*>(iv128Bit.c_str()))
         );
 
-    if (decryptInitResult != 1) {
+    if (decryptInitResult != 1) 
+    {
         EVP_CIPHER_CTX_free(ctx);
         throw CryptoHandlerException("Failed to create initialize symmetric decryption object");
     }
@@ -103,7 +108,8 @@ std::string AES256EncryptorHandler::decrypt(const std::string& cyphertext,const 
             reinterpret_cast<unsigned char*>(const_cast<char*>(cyphertext.data() + AES_BLOCK_SIZE)), 
             static_cast<int>(cyphertext.size() - AES_BLOCK_SIZE));
 
-    if (decryptUpdateResult != 1) {
+    if (decryptUpdateResult != 1) 
+    {
         EVP_CIPHER_CTX_free(ctx);
         throw CryptoHandlerException("Failed to update the decryption object");
     }
