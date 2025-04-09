@@ -41,13 +41,16 @@ target_sources(
     
     PUBLIC ${PROJECT_SOURCE_DIR}/include/AES256EncryptorHandler.hpp
     PUBLIC ${PROJECT_SOURCE_DIR}/include/RSAEncryptorHandler.hpp
+    PUBLIC ${PROJECT_SOURCE_DIR}/include/SHAHashHandler.hpp
 
     PRIVATE ${PROJECT_SOURCE_DIR}/include/CryptoHandler.hpp
+    PRIVATE ${PROJECT_SOURCE_DIR}/include/HashHandler.hpp
 
     PRIVATE ${PROJECT_SOURCE_DIR}/include/Utils.hpp
 
     PRIVATE ${PROJECT_SOURCE_DIR}/src/AES256EncryptorHandler.cpp
     PRIVATE ${PROJECT_SOURCE_DIR}/src/RSAEncryptorHandler.cpp
+    PRIVATE ${PROJECT_SOURCE_DIR}/src/SHAHashHandler.cpp
     PRIVATE ${PROJECT_SOURCE_DIR}/src/Utils.cpp
 )
 
@@ -60,5 +63,7 @@ enable_testing()
 add_test(NAME Test_AES256EncryptorHandler COMMAND Test_AES256EncryptorHandler)
 
 add_test(NAME Test_RSAEncryptorHandler COMMAND Test_RSAEncryptorHandler)
+
+add_test(NAME Test_SHA256HashHandler COMMAND Test_SHA256HashHandler)
 
 add_test(NAME Test_Utils COMMAND Test_Utils)

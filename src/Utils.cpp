@@ -7,6 +7,7 @@
 #include <random>
 #include <fstream>
 #include <filesystem>
+#include <openssl/evp.h>
 
 #include "Utils.hpp"
 
@@ -85,4 +86,16 @@ void deleteFile(const std::string& path)
 {
     if(!std::filesystem::remove(path))
         throw std::runtime_error("Tried to delete a non existent file");
+}
+
+std::string encodeToBase64(std::string payload)
+{
+    // TODO :
+    return "";
+}
+
+std::string decodeFromBase64(std::string base64payload)
+{
+    // TODO :
+    return "";
 }
