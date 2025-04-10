@@ -1,7 +1,5 @@
 #include "RSAEncryptorHandler.hpp"
 
-#include <iostream>
-
 bool test_helloWorld()
 {
     RSAEncryptorHandler test;

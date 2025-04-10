@@ -2,8 +2,6 @@
 
 #include "Utils.hpp"
 
-#include <iostream>
-
 bool test_helloWorld()
 {
     SHA256HashHandler test;

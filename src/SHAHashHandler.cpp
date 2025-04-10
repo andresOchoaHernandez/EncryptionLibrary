@@ -8,8 +8,6 @@
 
 #include <vector>
 
-#include <iostream>
-
 #include "SHAHashHandler.hpp"
 
 std::string SHA256HashHandler::hash(const std::string& payload)

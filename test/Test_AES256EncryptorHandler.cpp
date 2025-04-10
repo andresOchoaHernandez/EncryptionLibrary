@@ -1,6 +1,5 @@
 #include <random>
 #include <stdexcept>
-#include <iostream>
 
 #include "AES256EncryptorHandler.hpp"
 #include "Utils.hpp"
