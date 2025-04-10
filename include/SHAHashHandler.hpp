@@ -20,7 +20,7 @@ class SHA256HashHandler : public HashHandler
         /**
          * @brief Hashes a payload using SHA 256 algorithm
          * @param payload The string to be hashed
-         * @returns Hashed string
+         * @returns Hashed base64 encoded string
          */
         std::string hash(const std::string& payload) override;
 };

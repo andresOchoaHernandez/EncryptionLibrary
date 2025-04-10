@@ -8,6 +8,8 @@
 
 #include <vector>
 
+#include <iostream>
+
 #include "SHAHashHandler.hpp"
 
 std::string SHA256HashHandler::hash(const std::string& payload)
@@ -57,5 +59,20 @@ std::string SHA256HashHandler::hash(const std::string& payload)
 
     digestedPayload.resize(digestedPayloadSize);
 
-    return std::string(digestedPayload.begin(), digestedPayload.end());
+    int predictedLength = 4*((digestedPayloadSize+2)/3);
+
+    std::vector<unsigned char> result(predictedLength);
+
+    int encodeBlockResult = EVP_EncodeBlock(
+        result.data(), 
+        digestedPayload.data(), 
+        digestedPayloadSize
+    );
+
+    if(encodeBlockResult != predictedLength)
+    {
+        throw HashHandlerException("Error while encoding the hash to base64, predicted output length doesn't match the actual length");
+    }
+
+    return std::string(result.begin(), result.end());
 }

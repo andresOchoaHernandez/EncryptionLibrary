@@ -43,17 +43,3 @@ std::string readFile(const std::string& path);
  * @param path Path of the file to be deleted
  */
 void deleteFile(const std::string& path);
-
-/**
- * @brief Encodes a string to base64
- * @param payload Payload to encode
- * @returns A base64 string
- */
-std::string encodeToBase64(std::string payload);
-
-/**
- * @brief Decodes a string from base64
- * @param base64payload Payload to decode
- * @returns A decoded string
- */
-std::string decodeFromBase64(std::string base64payload);
