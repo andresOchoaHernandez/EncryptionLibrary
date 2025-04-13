@@ -1,4 +1,21 @@
 #include "RSAEncryptorHandler.hpp"
+#include "SHAHashHandler.hpp"
+
+#include <iostream>
+
+bool test_signature()
+{
+    RSAEncryptorHandler test;
+    RsaKeyPair res =  test.generateKeyPair(2048);
+    const std::string message = "Hello world!";
+
+    SHA256HashHandler hasher; 
+    const std::string messageDigest = hasher.hash(message);
+    const std::string signedDigest = test.signMessageDigestSha256(messageDigest,res.privateKey);
+    const bool verifyResult = test.verifyMessageDigestSha256(messageDigest,signedDigest,res.publicKey);
+
+    return verifyResult;
+}
 
 bool test_helloWorld()
 {
@@ -19,6 +36,9 @@ bool test_helloWorld()
 int main (int argc, char* argv[])
 {
     if(!test_helloWorld())
+        return -1;
+
+    if(!test_signature())
         return -1;
 
     return 0;

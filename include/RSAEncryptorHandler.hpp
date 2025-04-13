@@ -56,4 +56,20 @@ class RSAEncryptorHandler : public CryptoHandler
          * @returns Decrypted string
          */
         std::string decrypt(const std::string& cyphertext,const std::string& key) override;
+
+        /**
+         * @brief Signs a payload using a private key
+         * @param payload The payload to be signed
+         * @param privateKey Private key to be used for signing
+         * @returns Signature of the payload
+         */
+        std::string signMessageDigestSha256(const std::string& payload,const std::string& privateKey);
+
+        /**
+         * @brief Verifies a digital signature of a mesagge digest
+         * @param digitalSignature The digital signature to be verified
+         * @param publicKey Public key used to verify the digital signature
+         * @returns True if the digital signature is verified by the public key passed
+         */
+        bool verifyMessageDigestSha256(const std::string& messageDigest,const std::string& digitalSignature,const std::string& publicKey);
 };
