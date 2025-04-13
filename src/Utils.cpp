@@ -7,9 +7,17 @@
 #include <random>
 #include <fstream>
 #include <filesystem>
+#include <algorithm>
 #include <openssl/evp.h>
 
 #include "Utils.hpp"
+
+std::string trimString(const std::string &str) 
+{
+    std::string strCopy = str;
+    strCopy.erase(std::find(strCopy.begin(), strCopy.end(), '\0'), strCopy.end());
+    return strCopy;
+}
 
 std::string padString(const std::string& str, size_t numberOfBytes,char paddingChar)
 {
@@ -86,4 +94,44 @@ void deleteFile(const std::string& path)
 {
     if(!std::filesystem::remove(path))
         throw std::runtime_error("Tried to delete a non existent file");
+}
+
+std::string encodeInBase64(const std::string& payload)
+{
+    int predictedLength = 4*((payload.size()+2)/3);
+
+    std::vector<unsigned char> payloadEncoded(predictedLength);
+
+    int encodeBlockResult = EVP_EncodeBlock(
+        payloadEncoded.data(), 
+        reinterpret_cast<unsigned char*>(const_cast<char*>(payload.c_str())), 
+        payload.size()
+    );
+
+    if(encodeBlockResult != predictedLength)
+    {
+        throw std::runtime_error("Error while encoding the hash to base64, predicted output length doesn't match the actual length");
+    }
+
+    return trimString(std::string(payloadEncoded.begin(), payloadEncoded.end()));
+}
+
+std::string decodeFromBase64(const std::string& payload)
+{
+    int predictedPayloadBase64EncodedLength = 3*payload.size()/4;
+
+    std::vector<unsigned char> payloadDecoded(predictedPayloadBase64EncodedLength);
+    
+    int decodeBlockResult = EVP_DecodeBlock(
+        payloadDecoded.data(), 
+        reinterpret_cast<unsigned char*>(const_cast<char*>(payload.c_str())), 
+        payload.size()
+    );
+
+    if(decodeBlockResult != predictedPayloadBase64EncodedLength)
+    {
+        throw std::runtime_error("Error while decoding the payload from base 64");
+    }
+
+    return trimString(std::string(payloadDecoded.begin(), payloadDecoded.end()));
 }
