@@ -1,6 +1,8 @@
 #include <random>
 #include <stdexcept>
 
+#include <iostream>
+
 #include "AES256EncryptorHandler.hpp"
 #include "Utils.hpp"
 
@@ -127,6 +129,18 @@ bool test_randomMessages_2048Bit()
 
     const std::string cyphertext = test.encrypt(message,key);
 
+    std::cout << message << std::endl;
+
+    std::cout << "----------" << std::endl;
+
+    std::cout << cyphertext << std::endl;
+
+    std::cout << "----------" << std::endl;
+
+    std::cout << test.decrypt(cyphertext,key) << std::endl;
+
+    std::cout << (message == test.decrypt(cyphertext,key)) << std::endl;
+
     return message == test.decrypt(cyphertext,key);
 }
 
@@ -165,9 +179,6 @@ bool test_saveKeyToFileAndSaveCyphertextThenReadAndDecrypt()
 
 int main (int argc, char* argv[])
 {
-    if(!test_saveKeyToFileAndSaveCyphertextThenReadAndDecrypt())
-        return -1;
-
     if(!test_helloWorld())
         return -1;
 
@@ -181,6 +192,9 @@ int main (int argc, char* argv[])
         return -1;
 
     if(!test_edgeCases())
+        return -1;
+
+    if(!test_saveKeyToFileAndSaveCyphertextThenReadAndDecrypt())
         return -1;
         
     return 0;

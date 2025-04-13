@@ -10,12 +10,15 @@
 #include <algorithm>
 #include <openssl/evp.h>
 
+#include <iostream>
+
 #include "Utils.hpp"
 
 std::string trimString(const std::string &str) 
 {
     std::string strCopy = str;
-    strCopy.erase(std::find(strCopy.begin(), strCopy.end(), '\0'), strCopy.end());
+    strCopy.erase(std::remove(strCopy.begin(), strCopy.end(), '\n'), strCopy.cend());
+    strCopy.erase(std::remove(strCopy.begin(), strCopy.end(), '\0'), strCopy.cend());
     return strCopy;
 }
 
@@ -98,40 +101,95 @@ void deleteFile(const std::string& path)
 
 std::string encodeInBase64(const std::string& payload)
 {
-    int predictedLength = 4*((payload.size()+2)/3);
-
-    std::vector<unsigned char> payloadEncoded(predictedLength);
-
-    int encodeBlockResult = EVP_EncodeBlock(
-        payloadEncoded.data(), 
-        reinterpret_cast<unsigned char*>(const_cast<char*>(payload.c_str())), 
-        payload.size()
-    );
-
-    if(encodeBlockResult != predictedLength)
+    EVP_ENCODE_CTX *ctx = EVP_ENCODE_CTX_new();
+    EVP_EncodeInit(ctx);
+    if(ctx == nullptr)
     {
-        throw std::runtime_error("Error while encoding the hash to base64, predicted output length doesn't match the actual length");
+        throw std::runtime_error("Failed to create EVP_ENCODE_CTX_new object");
     }
+
+    int numberOfBlocks = 1 + ((payload.size()-1)/48);
+    int bytesInTheLastBlock = payload.size() - ((numberOfBlocks-1)*48);
+    std::vector<unsigned char> payloadEncoded(65 * numberOfBlocks + 1);
+
+    int encodedBytes;
+    for(uint i = 0 ; i < numberOfBlocks; i++)
+    {        
+        int encodeUpdateResult = EVP_EncodeUpdate(
+            ctx,
+            payloadEncoded.data() + 65*i,
+            &encodedBytes,
+            reinterpret_cast<unsigned char*>(const_cast<char*>(payload.c_str())) + 48*i,
+            i == numberOfBlocks - 1 ? bytesInTheLastBlock : 48
+        );
+
+        if(encodeUpdateResult <= 0)
+        {
+            EVP_ENCODE_CTX_free(ctx);
+            throw std::runtime_error("Error while encoding the payload");
+        }
+
+        if(encodedBytes == 0)
+        {
+            EVP_EncodeFinal(
+                ctx,
+                payloadEncoded.data() + 65*(numberOfBlocks-1),
+                &encodedBytes
+            );
+        }
+    }
+
+    EVP_ENCODE_CTX_free(ctx);
 
     return trimString(std::string(payloadEncoded.begin(), payloadEncoded.end()));
 }
 
 std::string decodeFromBase64(const std::string& payload)
 {
-    int predictedPayloadBase64EncodedLength = 3*payload.size()/4;
+    EVP_ENCODE_CTX *ctx = EVP_ENCODE_CTX_new();
+    EVP_DecodeInit(ctx);
+    if(ctx == nullptr)
+    {
+        throw std::runtime_error("Failed to create EVP_ENCODE_CTX_new object");
+    }
 
-    std::vector<unsigned char> payloadDecoded(predictedPayloadBase64EncodedLength);
+    int numberOfBlocks = 1 + ((payload.size()-1)/80);
+    int bytesInTheLastBlock = payload.size() - ((numberOfBlocks-1)*80);
+    std::vector<unsigned char> payloadDecoded(3*payload.size()/4);
+
+    int decodedBytes;
+    for(uint i = 0 ; i < (numberOfBlocks-1); i++)
+    {        
+        int decodeUpdate = EVP_DecodeUpdate(
+            ctx,
+            payloadDecoded.data()+ 60*i,
+            &decodedBytes,
+            reinterpret_cast<unsigned char*>(const_cast<char*>(payload.c_str()))+ 80*i,
+            80
+        );
     
-    int decodeBlockResult = EVP_DecodeBlock(
-        payloadDecoded.data(), 
-        reinterpret_cast<unsigned char*>(const_cast<char*>(payload.c_str())), 
-        payload.size()
+        if(decodeUpdate == -1)
+        {
+            EVP_ENCODE_CTX_free(ctx);
+            throw std::runtime_error("Error while decoding the payload 1");
+        }
+    }
+
+    int decodeUpdate = EVP_DecodeUpdate(
+        ctx,
+        payloadDecoded.data()+ 60*(numberOfBlocks-1),
+        &decodedBytes,
+        reinterpret_cast<unsigned char*>(const_cast<char*>(payload.c_str()))+ 80*(numberOfBlocks-1),
+        bytesInTheLastBlock
     );
 
-    if(decodeBlockResult != predictedPayloadBase64EncodedLength)
+    if(decodeUpdate == -1)
     {
-        throw std::runtime_error("Error while decoding the payload from base 64");
+        EVP_ENCODE_CTX_free(ctx);
+        throw std::runtime_error("Error while decoding the payload 1");
     }
+
+    EVP_ENCODE_CTX_free(ctx);
 
     return trimString(std::string(payloadDecoded.begin(), payloadDecoded.end()));
 }
