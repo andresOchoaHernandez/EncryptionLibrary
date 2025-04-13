@@ -1,8 +1,6 @@
 #include "RSAEncryptorHandler.hpp"
 #include "SHAHashHandler.hpp"
 
-#include <iostream>
-
 bool test_signature()
 {
     RSAEncryptorHandler test;
