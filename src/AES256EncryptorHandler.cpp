@@ -66,12 +66,12 @@ std::string AES256EncryptorHandler::encrypt(const std::string& plaintext,const s
 
     EVP_CIPHER_CTX_free(ctx);
     
-    return encodeInBase64(iv128Bit + std::string(cyphertext.begin(), cyphertext.end()));
+    return iv128Bit + std::string(cyphertext.begin(), cyphertext.end());
 }
 
 std::string AES256EncryptorHandler::decrypt(const std::string& base64EncodedCyphertext,const std::string& key)
 {
-    std::string cyphertext = decodeFromBase64(base64EncodedCyphertext);
+    std::string cyphertext = base64EncodedCyphertext;
 
     std::string key256Bit = padString(key,32,'0');
     std::string iv128Bit(AES_BLOCK_SIZE,'0');
