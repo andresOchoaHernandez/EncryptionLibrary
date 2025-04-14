@@ -10,8 +10,6 @@
 #include <algorithm>
 #include <openssl/evp.h>
 
-#include <iostream>
-
 #include "Utils.hpp"
 
 std::string trimString(const std::string &str) 
@@ -157,6 +155,9 @@ std::string decodeFromBase64(const std::string& payload)
     int bytesInTheLastBlock = payload.size() - ((numberOfBlocks-1)*80);
     std::vector<unsigned char> payloadDecoded(3*payload.size()/4);
 
+    //std::cout << "Number of blocks : " << numberOfBlocks << std::endl;
+    //std::cout << "Payload size : " << payload.size() << std::endl;
+
     int decodedBytes;
     for(uint i = 0 ; i < (numberOfBlocks-1); i++)
     {        
@@ -171,8 +172,11 @@ std::string decodeFromBase64(const std::string& payload)
         if(decodeUpdate == -1)
         {
             EVP_ENCODE_CTX_free(ctx);
-            throw std::runtime_error("Error while decoding the payload 1");
+            throw std::runtime_error("Error while decoding the payload");
         }
+
+
+        //std::cout << "Block : " << i << " Decoded Bytes : " << decodedBytes << " Remaining bytes in the ctx : " << EVP_ENCODE_CTX_num(ctx) << std::endl;
     }
 
     int decodeUpdate = EVP_DecodeUpdate(
@@ -186,7 +190,7 @@ std::string decodeFromBase64(const std::string& payload)
     if(decodeUpdate == -1)
     {
         EVP_ENCODE_CTX_free(ctx);
-        throw std::runtime_error("Error while decoding the payload 1");
+        throw std::runtime_error("Error while decoding the payload");
     }
 
     EVP_ENCODE_CTX_free(ctx);

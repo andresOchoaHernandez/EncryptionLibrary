@@ -1,8 +1,6 @@
 #include <random>
 #include <stdexcept>
 
-#include <iostream>
-
 #include "AES256EncryptorHandler.hpp"
 #include "Utils.hpp"
 
@@ -122,38 +120,18 @@ bool test_stressTest_sameKeyRandomLengthMessage()
 bool test_randomMessages_2048Bit()
 {
     AES256EncryptorHandler test;
-
     const std::string key = test.generateKey();
-
     const std::string message = generateRandomString(2048);
-
     const std::string cyphertext = test.encrypt(message,key);
-
-    std::cout << message << std::endl;
-
-    std::cout << "----------" << std::endl;
-
-    std::cout << cyphertext << std::endl;
-
-    std::cout << "----------" << std::endl;
-
-    std::cout << test.decrypt(cyphertext,key) << std::endl;
-
-    std::cout << (message == test.decrypt(cyphertext,key)) << std::endl;
-
     return message == test.decrypt(cyphertext,key);
 }
 
 bool test_helloWorld()
 {
     AES256EncryptorHandler test;
-
     const std::string key = test.generateKey();
-
     const std::string message = "Hello world!";
-
     const std::string cyphertext = test.encrypt(message,key);
-
     return message == test.decrypt(cyphertext,key);
 }
 
