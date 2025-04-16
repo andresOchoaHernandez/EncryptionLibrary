@@ -1,8 +1,30 @@
 #include <random>
 #include <stdexcept>
 
+#include <iostream>
+
 #include "AES256EncryptorHandler.hpp"
 #include "Utils.hpp"
+
+bool test_saveKeyToFileAndSaveCyphertextThenReadAndDecrypt()
+{
+    AES256EncryptorHandler test;
+
+    const std::string key = test.generateKey();
+
+    const std::string message = "This is a secret message! I hope no one is able to decrypt it";
+
+    writeFile("sKey.txt",key);
+    writeFile("cyphertext.txt",test.encrypt(message,key));
+
+    const std::string rKey = readFile("sKey.txt"); 
+    const std::string cyphertext = readFile("cyphertext.txt");
+
+    deleteFile("sKey.txt");
+    deleteFile("cyphertext.txt");
+
+    return message == test.decrypt(cyphertext,rKey);
+}
 
 bool test_noInitVector()
 {
@@ -123,7 +145,8 @@ bool test_randomMessages_2048Bit()
     const std::string key = test.generateKey();
     const std::string message = generateRandomString(2048);
     const std::string cyphertext = test.encrypt(message,key);
-    return message == test.decrypt(cyphertext,key);
+    const std::string decryptedMessage =test.decrypt(cyphertext,key);
+    return message == decryptedMessage;
 }
 
 bool test_helloWorld()
@@ -132,27 +155,8 @@ bool test_helloWorld()
     const std::string key = test.generateKey();
     const std::string message = "Hello world!";
     const std::string cyphertext = test.encrypt(message,key);
-    return message == test.decrypt(cyphertext,key);
-}
-
-bool test_saveKeyToFileAndSaveCyphertextThenReadAndDecrypt()
-{
-    AES256EncryptorHandler test;
-
-    const std::string key = test.generateKey();
-
-    const std::string message = "This is a secret message! I hope no one is able to decrypt it";
-
-    writeFile("sKey.txt",key);
-    writeFile("cyphertext.txt",test.encrypt(message,key));
-
-    const std::string rKey = readFile("sKey.txt"); 
-    const std::string cyphertext = readFile("cyphertext.txt");
-
-    deleteFile("sKey.txt");
-    deleteFile("cyphertext.txt");
-
-    return message == test.decrypt(cyphertext,rKey);
+    const std::string decryptedMessage =test.decrypt(cyphertext,key);
+    return message == decryptedMessage;
 }
 
 int main (int argc, char* argv[])
@@ -161,7 +165,7 @@ int main (int argc, char* argv[])
         return -1;
 
     if(!test_randomMessages_2048Bit())
-        return -1;
+         return -1;
 
     if(!test_stressTest_sameKeyRandomLengthMessage())
         return -1;

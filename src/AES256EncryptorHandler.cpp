@@ -66,17 +66,18 @@ std::string AES256EncryptorHandler::encrypt(const std::string& plaintext,const s
 
     EVP_CIPHER_CTX_free(ctx);
     
-    return iv128Bit + std::string(cyphertext.begin(), cyphertext.end());
+    return iv128Bit + encodeInBase64(cyphertext);
 }
 
 std::string AES256EncryptorHandler::decrypt(const std::string& base64EncodedCyphertext,const std::string& key)
 {
-    std::string cyphertext = base64EncodedCyphertext;
-
     std::string key256Bit = padString(key,32,'0');
     std::string iv128Bit(AES_BLOCK_SIZE,'0');
 
-    std::copy(cyphertext.begin(), cyphertext.begin() + AES_BLOCK_SIZE, iv128Bit.begin());
+    std::copy(base64EncodedCyphertext.begin(), base64EncodedCyphertext.begin() + AES_BLOCK_SIZE, iv128Bit.begin());
+
+
+    std::vector<unsigned char> cyphertext = decodeFromBase64(std::string(base64EncodedCyphertext.begin() + AES_BLOCK_SIZE,base64EncodedCyphertext.end()));
 
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
     if(ctx == nullptr)
@@ -99,7 +100,7 @@ std::string AES256EncryptorHandler::decrypt(const std::string& base64EncodedCyph
         throw CryptoHandlerException("Failed to create initialize symmetric decryption object");
     }
 
-    std::vector<unsigned char> plaintext(cyphertext.size() - AES_BLOCK_SIZE);
+    std::vector<unsigned char> plaintext(cyphertext.size());
     int plaintextLength;
 
     int decryptUpdateResult = 
@@ -107,8 +108,9 @@ std::string AES256EncryptorHandler::decrypt(const std::string& base64EncodedCyph
             ctx, 
             plaintext.data(), 
             &plaintextLength, 
-            reinterpret_cast<unsigned char*>(const_cast<char*>(cyphertext.data() + AES_BLOCK_SIZE)), 
-            static_cast<int>(cyphertext.size() - AES_BLOCK_SIZE));
+            cyphertext.data(), 
+            cyphertext.size()
+        );
 
     if (decryptUpdateResult != 1) 
     {

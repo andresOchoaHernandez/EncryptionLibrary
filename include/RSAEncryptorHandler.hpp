@@ -45,17 +45,17 @@ class RSAEncryptorHandler : public CryptoHandler
          * @brief Encrypts a message using RSA
          * @param plaintext Message to be encrypted
          * @param key Key to be used for RSA asymmetric encryption
-         * @returns Encrypted string
+         * @returns Encrypted cyphertext encoded in base 64
          */
         std::string encrypt(const std::string& plaintext,const std::string& key) override;
 
         /**
          * @brief Decrypts a message using RSA
-         * @param cyphertext The payload to be decrypted
+         * @param base64EncodedCyphertext Base 64 encoded payload to be decrypted. The payload to be decrypted
          * @param key Key to be used for RSA asymmetric decryption
          * @returns Decrypted string
          */
-        std::string decrypt(const std::string& cyphertext,const std::string& key) override;
+        std::string decrypt(const std::string& base64EncodedCyphertext,const std::string& key) override;
 
         /**
          * @brief Signs a payload using a private key

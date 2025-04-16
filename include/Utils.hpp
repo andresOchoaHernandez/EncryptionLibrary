@@ -7,6 +7,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 /**
  * @brief Adds a specifed padding character to a string or truncates it if needed, depending on the numberOfBytes specified
@@ -49,11 +50,11 @@ void deleteFile(const std::string& path);
  * @param payload Payload to be encoded
  * @returns A base 64 encoded string
  */
-std::string encodeInBase64(const std::string& payload);
+std::string encodeInBase64(const std::vector<unsigned char>& payload);
 
 /**
  * @brief Decodes a string from base 64
  * @param payload Base 64 encoded string
  * @returns A base 64 decoded string
  */
-std::string decodeFromBase64(const std::string& payload);
+std::vector<unsigned char> decodeFromBase64(const std::string& payload);

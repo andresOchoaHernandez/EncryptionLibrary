@@ -10,6 +10,8 @@
 #include <algorithm>
 #include <openssl/evp.h>
 
+#include <iostream>
+
 #include "Utils.hpp"
 
 std::string trimString(const std::string &str) 
@@ -17,6 +19,13 @@ std::string trimString(const std::string &str)
     std::string strCopy = str;
     strCopy.erase(std::remove(strCopy.begin(), strCopy.end(), '\n'), strCopy.cend());
     strCopy.erase(std::remove(strCopy.begin(), strCopy.end(), '\0'), strCopy.cend());
+    return strCopy;
+}
+
+std::string trimPadding(const std::string &str) 
+{
+    std::string strCopy = str;
+    strCopy.erase(std::remove(strCopy.begin(), strCopy.end(), '='), strCopy.cend());
     return strCopy;
 }
 
@@ -97,7 +106,7 @@ void deleteFile(const std::string& path)
         throw std::runtime_error("Tried to delete a non existent file");
 }
 
-std::string encodeInBase64(const std::string& payload)
+std::string encodeInBase64(const std::vector<unsigned char>& payload)
 {
     EVP_ENCODE_CTX *ctx = EVP_ENCODE_CTX_new();
     EVP_EncodeInit(ctx);
@@ -117,7 +126,7 @@ std::string encodeInBase64(const std::string& payload)
             ctx,
             payloadEncoded.data() + 65*i,
             &encodedBytes,
-            reinterpret_cast<unsigned char*>(const_cast<char*>(payload.c_str())) + 48*i,
+            payload.data() + 48*i,
             i == numberOfBlocks - 1 ? bytesInTheLastBlock : 48
         );
 
@@ -142,7 +151,7 @@ std::string encodeInBase64(const std::string& payload)
     return trimString(std::string(payloadEncoded.begin(), payloadEncoded.end()));
 }
 
-std::string decodeFromBase64(const std::string& payload)
+std::vector<unsigned char> decodeFromBase64(const std::string& payload)
 {
     EVP_ENCODE_CTX *ctx = EVP_ENCODE_CTX_new();
     EVP_DecodeInit(ctx);
@@ -155,10 +164,8 @@ std::string decodeFromBase64(const std::string& payload)
     int bytesInTheLastBlock = payload.size() - ((numberOfBlocks-1)*80);
     std::vector<unsigned char> payloadDecoded(3*payload.size()/4);
 
-    //std::cout << "Number of blocks : " << numberOfBlocks << std::endl;
-    //std::cout << "Payload size : " << payload.size() << std::endl;
-
     int decodedBytes;
+    int resultSize = 0;
     for(uint i = 0 ; i < (numberOfBlocks-1); i++)
     {        
         int decodeUpdate = EVP_DecodeUpdate(
@@ -168,15 +175,14 @@ std::string decodeFromBase64(const std::string& payload)
             reinterpret_cast<unsigned char*>(const_cast<char*>(payload.c_str()))+ 80*i,
             80
         );
-    
+
         if(decodeUpdate == -1)
         {
             EVP_ENCODE_CTX_free(ctx);
             throw std::runtime_error("Error while decoding the payload");
         }
 
-
-        //std::cout << "Block : " << i << " Decoded Bytes : " << decodedBytes << " Remaining bytes in the ctx : " << EVP_ENCODE_CTX_num(ctx) << std::endl;
+        resultSize += decodedBytes;
     }
 
     int decodeUpdate = EVP_DecodeUpdate(
@@ -193,7 +199,25 @@ std::string decodeFromBase64(const std::string& payload)
         throw std::runtime_error("Error while decoding the payload");
     }
 
+    resultSize += decodedBytes;
+
+    int decodeUpdateFinal = EVP_DecodeFinal(
+        ctx,
+        payloadDecoded.data()+ 60*(numberOfBlocks-1),
+        &decodedBytes
+    );
+
+    if(decodeUpdateFinal == -1)
+    {
+        EVP_ENCODE_CTX_free(ctx);
+        throw std::runtime_error("Error while decoding the payload");
+    }
+
+    resultSize += decodedBytes;
+
+    payloadDecoded.resize(resultSize);
+
     EVP_ENCODE_CTX_free(ctx);
 
-    return trimString(std::string(payloadDecoded.begin(), payloadDecoded.end()));
+    return payloadDecoded;
 }

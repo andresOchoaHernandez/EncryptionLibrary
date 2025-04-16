@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "RSAEncryptorHandler.hpp"
+#include "Utils.hpp"
 
 EVP_PKEY* stringToEVP_PKEY(const std::string& stringKey,int keyType)
 {
@@ -169,10 +170,10 @@ std::string RSAEncryptorHandler::encrypt(const std::string& plaintext,const std:
     EVP_PKEY_free(publicKey);
     EVP_PKEY_CTX_free(ctx);
 
-    return std::string(cyphertext.begin(), cyphertext.end());
+    return encodeInBase64(cyphertext);
 }
 
-std::string RSAEncryptorHandler::decrypt(const std::string& cyphertext,const std::string& key)
+std::string RSAEncryptorHandler::decrypt(const std::string& base64EncodedCyphertext,const std::string& key)
 {
     EVP_PKEY *privateKey = privateKeyStringToEVP_PKEY(key);
 
@@ -196,14 +197,15 @@ std::string RSAEncryptorHandler::decrypt(const std::string& cyphertext,const std
         throw CryptoHandlerException("Failed to set the RSA padding");
     }
 
-    size_t plainTextLength;
+    std::vector<unsigned char> cyphertext = decodeFromBase64(base64EncodedCyphertext);
 
+    size_t plainTextLength;
     int determineOutputLengthResult = EVP_PKEY_decrypt(
         ctx,
         nullptr, 
         &plainTextLength,
-        reinterpret_cast<unsigned char*>(const_cast<char*>(cyphertext.c_str())), 
-        static_cast<int>(cyphertext.length())
+        cyphertext.data(), 
+        cyphertext.size()
     );
     
     if (determineOutputLengthResult <= 0) 
@@ -218,8 +220,8 @@ std::string RSAEncryptorHandler::decrypt(const std::string& cyphertext,const std
         ctx,
         plaintext.data(), 
         &plainTextLength,
-        reinterpret_cast<unsigned char*>(const_cast<char*>(cyphertext.c_str())), 
-        static_cast<int>(cyphertext.length())
+        cyphertext.data(), 
+        cyphertext.size()
     );
     
     if (decryptionResult <= 0) 
