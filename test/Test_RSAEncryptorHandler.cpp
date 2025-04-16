@@ -1,5 +1,44 @@
+#include <random>
+
 #include "RSAEncryptorHandler.hpp"
 #include "SHAHashHandler.hpp"
+#include "Utils.hpp"
+
+#include <iostream>
+
+bool test_stressTest_randomKeyRandomLengthMessage()
+{
+    const int maximumNumberOfBytesOfTheMessage = 256;
+    const int numberOfIterations = 1000;
+
+    std::random_device random_device;
+    std::mt19937 generator(random_device());
+    std::uniform_int_distribution<> distribution(0,maximumNumberOfBytesOfTheMessage);
+
+    RSAEncryptorHandler test;
+
+    for(int i = 0 ; i < numberOfIterations; i++)
+    {
+        const RsaKeyPair key = test.generateKeyPair(2048);
+
+        const std::string message = generateRandomString(distribution(generator));
+
+        const std::string cyphertext = test.encrypt(message,key.publicKey);
+    
+        const std::string decryptedMessage = test.decrypt(cyphertext,key.privateKey);
+
+        if(message != decryptedMessage)
+        {
+            std::cout << message.size() << std::endl;
+            std::cout << message << std::endl;
+            std::cout << decryptedMessage.size() << std::endl;
+            std::cout << decryptedMessage << std::endl;
+            return false;
+        }
+    }
+
+    return true;
+}
 
 bool test_signature()
 {
@@ -37,6 +76,9 @@ int main (int argc, char* argv[])
         return -1;
 
     if(!test_signature())
+        return -1;
+
+    if(!test_stressTest_randomKeyRandomLengthMessage())
         return -1;
 
     return 0;
