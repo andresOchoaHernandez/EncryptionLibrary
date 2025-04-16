@@ -1,8 +1,6 @@
 #include <random>
 #include <stdexcept>
 
-#include <iostream>
-
 #include "AES256EncryptorHandler.hpp"
 #include "Utils.hpp"
 
@@ -64,10 +62,18 @@ bool test_emptyString()
     const std::string key = test.generateKey();
 
     const std::string message = "";
+    bool result;
+    try
+    {
+        test.encrypt(message,key);
+        result = false;
+    }
+    catch(const std::length_error& e)
+    {
+        result = true;
+    }
 
-    const std::string cyphertext = test.encrypt(message,key);
-
-    return message == test.decrypt(cyphertext,key);
+    return result;
 }
 
 bool test_edgeCases()
@@ -145,8 +151,7 @@ bool test_randomMessages_2048Bit()
     const std::string key = test.generateKey();
     const std::string message = generateRandomString(2048);
     const std::string cyphertext = test.encrypt(message,key);
-    const std::string decryptedMessage =test.decrypt(cyphertext,key);
-    return message == decryptedMessage;
+    return message == test.decrypt(cyphertext,key);
 }
 
 bool test_helloWorld()
@@ -155,8 +160,7 @@ bool test_helloWorld()
     const std::string key = test.generateKey();
     const std::string message = "Hello world!";
     const std::string cyphertext = test.encrypt(message,key);
-    const std::string decryptedMessage =test.decrypt(cyphertext,key);
-    return message == decryptedMessage;
+    return message == test.decrypt(cyphertext,key);
 }
 
 int main (int argc, char* argv[])
@@ -165,7 +169,7 @@ int main (int argc, char* argv[])
         return -1;
 
     if(!test_randomMessages_2048Bit())
-         return -1;
+        return -1;
 
     if(!test_stressTest_sameKeyRandomLengthMessage())
         return -1;

@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "AES256EncryptorHandler.hpp"
-
 #include "Utils.hpp"
 
 std::string AES256EncryptorHandler::generateKey()

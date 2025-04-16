@@ -4,13 +4,12 @@
  * @brief Implementation file for Utils.hpp
  */
 
+#include <openssl/evp.h>
+
 #include <random>
 #include <fstream>
 #include <filesystem>
 #include <algorithm>
-#include <openssl/evp.h>
-
-#include <iostream>
 
 #include "Utils.hpp"
 
