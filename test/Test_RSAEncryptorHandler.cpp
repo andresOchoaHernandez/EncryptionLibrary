@@ -13,7 +13,7 @@ bool test_stressTest_randomKeyRandomLengthMessage()
 
     std::random_device random_device;
     std::mt19937 generator(random_device());
-    std::uniform_int_distribution<> distribution(0,maximumNumberOfBytesOfTheMessage);
+    std::uniform_int_distribution<> distribution(1,maximumNumberOfBytesOfTheMessage);
 
     RSAEncryptorHandler test;
 

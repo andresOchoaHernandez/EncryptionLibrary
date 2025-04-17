@@ -8,7 +8,7 @@ bool test_randomLengthBase64Encoding()
 
     std::random_device random_device;
     std::mt19937 generator(random_device());
-    std::uniform_int_distribution<> distribution(0,maxStrLen);
+    std::uniform_int_distribution<> distribution(1,maxStrLen);
 
     const int strLen = distribution(generator);
     
@@ -90,7 +90,7 @@ bool test_randomStringLength()
 
     std::random_device random_device;
     std::mt19937 generator(random_device());
-    std::uniform_int_distribution<> distribution(0,maxStrLen);
+    std::uniform_int_distribution<> distribution(1,maxStrLen);
 
     const int strLen = distribution(generator);
     

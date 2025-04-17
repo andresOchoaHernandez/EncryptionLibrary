@@ -118,12 +118,14 @@ std::string RSAEncryptorHandler::encrypt(const std::string& plaintext,const std:
     EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new(publicKey, nullptr);
     if(ctx == nullptr)
     {
+        EVP_PKEY_free(publicKey);
         throw CryptoHandlerException("Failed to create EVP_PKEY_CTX object");
     }
 
     int initializeEncryptionResult = EVP_PKEY_encrypt_init(ctx);
     if (initializeEncryptionResult <= 0) 
     {
+        EVP_PKEY_free(publicKey);
         EVP_PKEY_CTX_free(ctx);
         throw CryptoHandlerException("Failed to initialize the encryption object");
     }
@@ -131,6 +133,7 @@ std::string RSAEncryptorHandler::encrypt(const std::string& plaintext,const std:
     int setRsaPaddingResult = EVP_PKEY_CTX_set_rsa_padding(ctx, RSA_PKCS1_OAEP_PADDING);
     if (setRsaPaddingResult <= 0) 
     {
+        EVP_PKEY_free(publicKey);
         EVP_PKEY_CTX_free(ctx);
         throw CryptoHandlerException("Failed to set the RSA padding");
     }
@@ -147,6 +150,7 @@ std::string RSAEncryptorHandler::encrypt(const std::string& plaintext,const std:
     
     if (determineOutputLengthResult <= 0) 
     {
+        EVP_PKEY_free(publicKey);
         EVP_PKEY_CTX_free(ctx);
         throw CryptoHandlerException("Failed to determine the cyphertext length");
     }
@@ -163,6 +167,7 @@ std::string RSAEncryptorHandler::encrypt(const std::string& plaintext,const std:
     
     if (encryptionResult <= 0) 
     {
+        EVP_PKEY_free(publicKey);
         EVP_PKEY_CTX_free(ctx);
         throw CryptoHandlerException("Failed to encrypt the plaintext");
     }
@@ -180,12 +185,14 @@ std::string RSAEncryptorHandler::decrypt(const std::string& base64EncodedCyphert
     EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new(privateKey, nullptr);
     if(ctx == nullptr)
     {
+        EVP_PKEY_free(privateKey);
         throw CryptoHandlerException("Failed to create EVP_PKEY_CTX object");
     }
 
     int initializeDecryptionResult = EVP_PKEY_decrypt_init(ctx);
     if (initializeDecryptionResult <= 0) 
     {
+        EVP_PKEY_free(privateKey);
         EVP_PKEY_CTX_free(ctx);
         throw CryptoHandlerException("Failed to initialize the decryption object");
     }
@@ -193,6 +200,7 @@ std::string RSAEncryptorHandler::decrypt(const std::string& base64EncodedCyphert
     int setRsaPaddingResult = EVP_PKEY_CTX_set_rsa_padding(ctx, RSA_PKCS1_OAEP_PADDING);
     if (setRsaPaddingResult <= 0) 
     {
+        EVP_PKEY_free(privateKey);
         EVP_PKEY_CTX_free(ctx);
         throw CryptoHandlerException("Failed to set the RSA padding");
     }
@@ -210,6 +218,7 @@ std::string RSAEncryptorHandler::decrypt(const std::string& base64EncodedCyphert
     
     if (determineOutputLengthResult <= 0) 
     {
+        EVP_PKEY_free(privateKey);
         EVP_PKEY_CTX_free(ctx);
         throw CryptoHandlerException("Failed to determine the plaintext length");
     }
@@ -226,9 +235,12 @@ std::string RSAEncryptorHandler::decrypt(const std::string& base64EncodedCyphert
     
     if (decryptionResult <= 0) 
     {
+        EVP_PKEY_free(privateKey);
         EVP_PKEY_CTX_free(ctx);
         throw CryptoHandlerException("Failed to decrypt the cyphertext");
     }
+
+    plaintext.resize(plainTextLength);
 
     EVP_PKEY_free(privateKey);
     EVP_PKEY_CTX_free(ctx);
@@ -274,6 +286,8 @@ std::string RSAEncryptorHandler::signMessageDigestSha256(const std::string& payl
 
     if(decodeBlockResult != predictedPayloadBase64EncodedLength)
     {
+        EVP_PKEY_free(pKey);
+        EVP_PKEY_CTX_free(ctx);
         throw CryptoHandlerException("Error while decoding the hash from base64, predicted output length doesn't match the actual length");
     }
 
