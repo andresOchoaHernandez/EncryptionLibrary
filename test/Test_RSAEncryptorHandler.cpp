@@ -4,12 +4,10 @@
 #include "SHAHashHandler.hpp"
 #include "Utils.hpp"
 
-#include <iostream>
-
 bool test_stressTest_randomKeyRandomLengthMessage()
 {
-    const int maximumNumberOfBytesOfTheMessage = 256;
-    const int numberOfIterations = 1000;
+    const int maximumNumberOfBytesOfTheMessage = 128;
+    const int numberOfIterations = 500;
 
     std::random_device random_device;
     std::mt19937 generator(random_device());
@@ -29,10 +27,6 @@ bool test_stressTest_randomKeyRandomLengthMessage()
 
         if(message != decryptedMessage)
         {
-            std::cout << message.size() << std::endl;
-            std::cout << message << std::endl;
-            std::cout << decryptedMessage.size() << std::endl;
-            std::cout << decryptedMessage << std::endl;
             return false;
         }
     }

@@ -145,7 +145,7 @@ std::string RSAEncryptorHandler::encrypt(const std::string& plaintext,const std:
         nullptr, 
         &cipertextLength,
         reinterpret_cast<unsigned char*>(const_cast<char*>(plaintext.c_str())), 
-        static_cast<int>(plaintext.length())
+        plaintext.length()
     );
     
     if (determineOutputLengthResult <= 0) 
@@ -162,7 +162,7 @@ std::string RSAEncryptorHandler::encrypt(const std::string& plaintext,const std:
         cyphertext.data(), 
         &cipertextLength,
         reinterpret_cast<unsigned char*>(const_cast<char*>(plaintext.c_str())), 
-        static_cast<int>(plaintext.length())
+        plaintext.length()
     );
     
     if (encryptionResult <= 0) 
