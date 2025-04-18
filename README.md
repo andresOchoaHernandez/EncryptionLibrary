@@ -1,4 +1,4 @@
-# EncryptedCommunication
+# Encryption Library
 This project is a C++ library that contains a set of classes that implement, using ```openssl``` under the hood, the following cryptographic functions :  
 
 * AES 256 GCM :
