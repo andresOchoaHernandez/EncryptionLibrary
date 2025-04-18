@@ -275,21 +275,7 @@ std::string RSAEncryptorHandler::signMessageDigestSha256(const std::string& payl
         throw CryptoHandlerException("Failed to set the RSA padding");
     }
 
-    /* Decoding the digest from base64 */
-    int predictedPayloadBase64EncodedLength = 3*payload.size()/4;
-    std::vector<unsigned char> payloadDecoded(predictedPayloadBase64EncodedLength);
-    int decodeBlockResult = EVP_DecodeBlock(
-        payloadDecoded.data(), 
-        reinterpret_cast<unsigned char*>(const_cast<char*>(payload.c_str())), 
-        payload.size()
-    );
-
-    if(decodeBlockResult != predictedPayloadBase64EncodedLength)
-    {
-        EVP_PKEY_free(pKey);
-        EVP_PKEY_CTX_free(ctx);
-        throw CryptoHandlerException("Error while decoding the hash from base64, predicted output length doesn't match the actual length");
-    }
+    std::vector<unsigned char> payloadDecoded = decodeFromBase64(payload);
 
     size_t signatureLength;
     int determineSignatureLength = EVP_PKEY_sign(
@@ -357,21 +343,7 @@ bool RSAEncryptorHandler::verifyMessageDigestSha256(const std::string& messageDi
         throw CryptoHandlerException("Failed to set the RSA padding");
     }
 
-    /* Decoding the digest from base64 */
-    int predictedPayloadBase64EncodedLength = 3*messageDigest.size()/4;
-    std::vector<unsigned char> messageDigestDecoded(predictedPayloadBase64EncodedLength);
-    int decodeBlockResult = EVP_DecodeBlock(
-        messageDigestDecoded.data(), 
-        reinterpret_cast<unsigned char*>(const_cast<char*>(messageDigest.c_str())), 
-        messageDigest.size()
-    );
-
-    if(decodeBlockResult != predictedPayloadBase64EncodedLength)
-    {
-        EVP_PKEY_free(pKey);
-        EVP_PKEY_CTX_free(ctx);
-        throw CryptoHandlerException("Error while decoding the hash from base64, predicted output length doesn't match the actual length");
-    }
+    std::vector<unsigned char> messageDigestDecoded = decodeFromBase64(messageDigest);
 
     int verifyResult = EVP_PKEY_verify(
         ctx, 
