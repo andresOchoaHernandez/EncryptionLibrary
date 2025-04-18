@@ -4,6 +4,31 @@
 #include "SHAHashHandler.hpp"
 #include "Utils.hpp"
 
+bool test_signatureStressTest()
+{
+    RSAEncryptorHandler test;
+    SHA256HashHandler hasher;
+
+    uint numberOfIterations = 500;
+
+    for(uint i=0 ; i< numberOfIterations ; i++)
+    {
+        RsaKeyPair res =  test.generateKeyPair(2048);
+    
+        const std::string message = generateRandomString(1000);
+     
+        const std::string messageDigest = hasher.hash(message);
+    
+        const std::string signedDigest = test.signMessageDigestSha256(messageDigest,res.privateKey);
+        if (!test.verifyMessageDigestSha256(messageDigest,signedDigest,res.publicKey))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool test_stressTest_randomKeyRandomLengthMessage()
 {
     const int maximumNumberOfBytesOfTheMessage = 128;
@@ -73,6 +98,9 @@ int main (int argc, char* argv[])
         return -1;
 
     if(!test_stressTest_randomKeyRandomLengthMessage())
+        return -1;
+
+    if(!test_signatureStressTest())
         return -1;
 
     return 0;
