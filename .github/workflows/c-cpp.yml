@@ -1,0 +1,33 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: install cmake
+      run: sudo apt install cmake
+    - name: install openssl
+      run: sudo apt install libssl-dev
+    - name: install doxygen
+      run: sudo apt install doxygen
+    - name: install graphviz
+      run: sudo apt install graphviz
+    - name: create build directory
+      run: mkdir build
+    - name: enter build directory
+      run: cd build
+    - name: Configure cmake
+      run: cmake ..
+    - name: build
+      run: make
+    - name: run all tests
+      run: make test
