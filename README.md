@@ -44,7 +44,7 @@ Enter the repo, create a build folder and compile :
 ```bash
 $ cd EncryptedCommunication
 $ mkdir build
-$ mkdir cd build
+$ cd build
 
 # Configure CMake
 $ cmake ..
