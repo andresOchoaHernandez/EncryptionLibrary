@@ -23,9 +23,6 @@ jobs:
       run: sudo apt install graphviz
     - name: create build directory
       run: mkdir build
-    - name: Debug
-      working-directory: ./build
-      run: ls
     - name: Configure cmake
       working-directory: ./build
       run: cmake ..
